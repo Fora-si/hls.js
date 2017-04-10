@@ -322,6 +322,27 @@ class StreamController extends EventHandler {
     return;
   }
 
+  _shouldLoadFragmentWithSameSN(fragPrevious, bufferEnd, levelDetails) {
+    if (fragPrevious) {
+      var bandwidth = this.hls.abrController._bwEstimator.getEstimate(),
+          previousLevel = this.levels[fragPrevious.level],
+          loadLevel = this.levels[this.level],
+          currentTime = this.lastCurrentTime,
+          targetDuration = levelDetails.targetduration;
+
+      if (bandwidth && loadLevel && currentTime && previousLevel && loadLevel.bitrate > previousLevel.bitrate) {
+        var timeToLoad = Math.max(0, bufferEnd - currentTime);
+        if (timeToLoad > 0) {
+          // we need ensure there is enough bandwidth to load 2 fragments in time
+          var dataToLoad = loadLevel.bitrate * targetDuration * 2;
+          var estimatedDataLoad = bandwidth * timeToLoad;
+          return estimatedDataLoad > dataToLoad;
+        }
+      }
+    }
+    return false;
+  }
+
   _ensureFragmentAtLivePoint(levelDetails, bufferEnd, start, end, fragPrevious, fragments, fragLen) {
     const config = this.hls.config, media = this.media;
 
@@ -361,7 +382,8 @@ class StreamController extends EventHandler {
          even if SN are not synchronized between playlists, loading this frag will help us
          compute playlist sliding and find the right one after in case it was not the right consecutive one */
       if (fragPrevious) {
-        const targetSN = fragPrevious.sn + 1;
+        var loadSameSN = this._shouldLoadFragmentWithSameSN(fragPrevious, bufferEnd, levelDetails);
+        const targetSN = loadSameSN ? fragPrevious.sn : fragPrevious.sn + 1;
         if (targetSN >= levelDetails.startSN && targetSN <= levelDetails.endSN) {
           const fragNext = fragments[targetSN - levelDetails.startSN];
           if (fragPrevious.cc === fragNext.cc) {
@@ -421,7 +443,12 @@ class StreamController extends EventHandler {
       }
       return 0;
     };
-
+    if (this._shouldLoadFragmentWithSameSN(fragPrevious, bufferEnd, levelDetails)) {
+        var targetSN = fragPrevious.sn;
+        if (targetSN >= levelDetails.startSN && targetSN <= levelDetails.endSN) {
+          return fragments[targetSN - levelDetails.startSN];
+        }
+    }
     if (bufferEnd < end) {
       if (bufferEnd > end - maxFragLookUpTolerance) {
         maxFragLookUpTolerance = 0;
