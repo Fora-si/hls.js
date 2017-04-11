@@ -328,13 +328,16 @@ class StreamController extends TaskLoop {
           previousLevel = this.levels[fragPrevious.level],
           loadLevel = this.levels[this.level],
           currentTime = this.lastCurrentTime,
+          fragEndTime = fragPrevious.endPTS,
           targetDuration = levelDetails.targetduration;
 
       if (bandwidth && loadLevel && currentTime && previousLevel && loadLevel.bitrate > previousLevel.bitrate) {
+        var fragSize = loadLevel.bitrate * targetDuration;
+        var fragLoadTime = fragSize / bandwidth;
         var timeToLoad = Math.max(0, bufferEnd - currentTime);
-        if (timeToLoad > 0) {
+        if (timeToLoad > 0 && currentTime + fragLoadTime < fragEndTime) {
           // we need ensure there is enough bandwidth to load 2 fragments in time
-          var dataToLoad = loadLevel.bitrate * targetDuration * 2;
+          var dataToLoad = fragSize * 2;
           var estimatedDataLoad = bandwidth * timeToLoad;
           return estimatedDataLoad > dataToLoad;
         }
