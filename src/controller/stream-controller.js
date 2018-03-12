@@ -297,23 +297,23 @@ class StreamController extends TaskLoop {
       this._loadFragmentOrKey(frag, level, levelDetails, pos, bufferEnd);
   }
 
-  _shouldLoadFragmentWithSameSN(fragPrevious, bufferEnd, levelDetails) {
+  _shouldLoadFragmentWithSameSN (fragPrevious, bufferEnd, levelDetails) {
     if (fragPrevious) {
-      var bandwidth = this.hls.abrController._bwEstimator.getEstimate(),
-          previousLevel = this.levels[fragPrevious.level],
-          loadLevel = this.levels[this.level],
-          currentTime = this.lastCurrentTime,
-          fragEndTime = fragPrevious.endPTS,
-          targetDuration = levelDetails.targetduration;
+      let bandwidth = this.hls.abrController._bwEstimator.getEstimate();
+      let previousLevel = this.levels[fragPrevious.level];
+      let loadLevel = this.levels[this.level];
+      let currentTime = this.lastCurrentTime;
+      let fragEndTime = fragPrevious.endPTS;
+      let targetDuration = levelDetails.targetduration;
 
       if (bandwidth && loadLevel && currentTime && previousLevel && loadLevel.bitrate > previousLevel.bitrate) {
-        var fragSize = loadLevel.bitrate * targetDuration;
-        var fragLoadTime = fragSize / bandwidth;
-        var timeToLoad = Math.max(0, bufferEnd - currentTime);
+        let fragSize = loadLevel.bitrate * targetDuration;
+        let fragLoadTime = fragSize / bandwidth;
+        let timeToLoad = Math.max(0, bufferEnd - currentTime);
         if (timeToLoad > 0 && currentTime + fragLoadTime < fragEndTime) {
           // we need ensure there is enough bandwidth to load 2 fragments in time
-          var dataToLoad = fragSize * 2;
-          var estimatedDataLoad = bandwidth * timeToLoad;
+          let dataToLoad = fragSize * 2;
+          let estimatedDataLoad = bandwidth * timeToLoad;
           return estimatedDataLoad > dataToLoad;
         }
       }
@@ -360,7 +360,7 @@ class StreamController extends TaskLoop {
          compute playlist sliding and find the right one after in case it was not the right consecutive one */
       if (fragPrevious) {
         if (!levelDetails.programDateTime) { // Uses buffer and sequence number to calculate switch segment (required if using EXT-X-DISCONTINUITY-SEQUENCE)
-          var loadSameSN = this._shouldLoadFragmentWithSameSN(fragPrevious, bufferEnd, levelDetails);
+          let loadSameSN = this._shouldLoadFragmentWithSameSN(fragPrevious, bufferEnd, levelDetails);
           const targetSN = loadSameSN ? fragPrevious.sn : fragPrevious.sn + 1;
           if (targetSN >= levelDetails.startSN && targetSN <= levelDetails.endSN) {
             const fragNext = fragments[targetSN - levelDetails.startSN];
@@ -462,10 +462,9 @@ class StreamController extends TaskLoop {
     let foundFrag;
 
     if (this._shouldLoadFragmentWithSameSN(fragPrevious, bufferEnd, levelDetails)) {
-        var targetSN = fragPrevious.sn;
-        if (targetSN >= levelDetails.startSN && targetSN <= levelDetails.endSN) {
-          return fragments[targetSN - levelDetails.startSN];
-        }
+      let targetSN = fragPrevious.sn;
+      if (targetSN >= levelDetails.startSN && targetSN <= levelDetails.endSN)
+        return fragments[targetSN - levelDetails.startSN];
     }
     if (bufferEnd < end) {
       if (!levelDetails.programDateTime) { // Uses buffer and sequence number to calculate switch segment (required if using EXT-X-DISCONTINUITY-SEQUENCE)
