@@ -268,14 +268,14 @@ class StreamController extends BaseStreamController {
     }
   }
 
-  _shouldLoadFragmentWithSameSN(fragPrevious, bufferEnd, levelDetails) {
+  _shouldLoadFragmentWithSameSN (fragPrevious, bufferEnd, levelDetails) {
     if (fragPrevious) {
       var bandwidth = this.hls.abrController._bwEstimator.getEstimate(),
-          previousLevel = this.levels[fragPrevious.level],
-          loadLevel = this.levels[this.level],
-          currentTime = this.lastCurrentTime,
-          fragEndTime = fragPrevious.endPTS,
-          targetDuration = levelDetails.targetduration;
+        previousLevel = this.levels[fragPrevious.level],
+        loadLevel = this.levels[this.level],
+        currentTime = this.lastCurrentTime,
+        fragEndTime = fragPrevious.endPTS,
+        targetDuration = levelDetails.targetduration;
 
       if (bandwidth && loadLevel && currentTime && previousLevel && loadLevel.bitrate > previousLevel.bitrate) {
         var fragSize = loadLevel.bitrate * targetDuration;
