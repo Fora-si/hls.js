@@ -303,7 +303,7 @@ class StreamController extends BaseStreamController {
         fragEndTime = fragPrevious.endPTS,
         targetDuration = levelDetails.targetduration;
 
-      if (bandwidth && loadLevel && currentTime && previousLevel && loadLevel.bitrate > previousLevel.bitrate) {
+      if (bandwidth && loadLevel && currentTime >= 0 && previousLevel && loadLevel.bitrate > previousLevel.bitrate) {
         var fragSize = loadLevel.bitrate * targetDuration;
         var fragLoadTime = fragSize / bandwidth;
         var timeToLoad = Math.max(0, bufferEnd - currentTime);
