@@ -67,7 +67,7 @@ describe('EMEController', () => {
     }, 0);
   });
 
-  it('should retrieve PSSH data if it exists in manifest', (done) => {
+  it('should retrieve PSSH data if it exists in manifest', () => {
     let reqMediaKsAccessSpy = sinon.spy(() => {
       return Promise.resolve({
         // Media-keys mock
@@ -100,10 +100,5 @@ describe('EMEController', () => {
 
     assert.equal(emeController._initDataType, 'cenc');
     assert.equal(62, emeController._initData.byteLength);
-
-    setTimeout(() => {
-      assert.equal(emeController._isMediaEncrypted, true);
-      done();
-    }, 0);
   });
 });
