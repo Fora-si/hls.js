@@ -122,6 +122,9 @@ class EMEController extends EventHandler {
 
     this._requestLicenseFailureCount = 0;
 
+    this._currentPssh = null;
+    this._keySystemPssh = null;
+
     /**
      * @private
      * https://www.w3.org/TR/encrypted-media/#initialization-data
@@ -312,6 +315,11 @@ class EMEController extends EventHandler {
   }
 
   _onMediaEncrypted (initDataType, initData) {
+    if (this._currentPssh === this._keySystemPssh) {
+      logger.log('Ignore media encrypted for duplicated PSSH');
+      return;
+    }
+    this._keySystemPssh = this._currentPssh;
     logger.log(`Media is encrypted using "${initDataType}" init data type`);
     this._isMediaEncrypted = true;
     this._mediaEncryptionInitDataType = initDataType;
@@ -581,6 +589,8 @@ class EMEController extends EventHandler {
     const details = levelkey.reluri.split(',');
     const encoding = details[0];
     const pssh = details[1];
+
+    this._currentPssh = pssh;
 
     if (drmIdentifier === 'com.microsoft.playready' && encoding.includes('base64')) {
       this._initData = buildPlayReadyPSSHBox(base64ToUint8Array(pssh)); // Playready is particular about the pssh box, so it needs to be handcrafted.
