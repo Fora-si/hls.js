@@ -336,6 +336,7 @@ class EMEController extends EventHandler {
 
       if (!keysListItem || !keysListItem.mediaKeys) {
         logger.error('Fatal: Media is encrypted but no CDM access or no keys have been obtained yet');
+        this._keySystemPssh = null;
         this.hls.trigger(Event.ERROR, {
           type: ErrorTypes.KEY_SYSTEM_ERROR,
           details: ErrorDetails.KEY_SYSTEM_NO_KEYS,
@@ -361,6 +362,7 @@ class EMEController extends EventHandler {
 
     if (!keysListItem) {
       logger.error('Fatal: Media is encrypted but not any key-system access has been obtained yet');
+      this._keySystemPssh = null;
       this.hls.trigger(Event.ERROR, {
         type: ErrorTypes.KEY_SYSTEM_ERROR,
         details: ErrorDetails.KEY_SYSTEM_NO_ACCESS,
