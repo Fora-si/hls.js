@@ -757,6 +757,39 @@ export default class BaseStreamController
     return lastPart && targetBufferTime > lastPart.start && lastPart.loaded;
   }
 
+  protected shouldLoadFragmentWithSameSN(
+    fragPrevious: Fragment,
+    bufferEnd: number,
+    levelDetails: LevelDetails
+  ): boolean {
+    const { levels, levelLastLoaded } = this;
+    const currentTime = this.lastCurrentTime;
+    const fragEndTime = fragPrevious.endPTS;
+    const targetDuration = levelDetails.targetduration;
+    const bandwidth = this.hls.bandwidthEstimate;
+    if (fragPrevious && levels && levelLastLoaded && fragEndTime) {
+      const previousLevel = levels[fragPrevious.level];
+      const loadLevel = levels[levelLastLoaded];
+      if (
+        bandwidth &&
+        loadLevel &&
+        previousLevel &&
+        loadLevel.bitrate > previousLevel.bitrate
+      ) {
+        const fragSize = loadLevel.bitrate * targetDuration;
+        const fragLoadTime = fragSize / bandwidth;
+        const timeToLoad = Math.max(0, bufferEnd - currentTime);
+        if (timeToLoad > 0 && currentTime + fragLoadTime < fragEndTime) {
+          // we need ensure there is enough bandwidth to load 2 fragments in time
+          const dataToLoad = fragSize * 2;
+          const estimatedDataLoad = bandwidth * timeToLoad;
+          return estimatedDataLoad > dataToLoad;
+        }
+      }
+    }
+    return false;
+  }
+
   /*
    This method is used find the best matching first fragment for a live playlist. This fragment is used to calculate the
    "sliding" of the playlist, which is its offset from the start of playback. After sliding we can compute the real
@@ -835,6 +868,16 @@ export default class BaseStreamController
       // Include incomplete fragment with parts at end
       fragments = fragments.concat(fragmentHint);
       endSN = fragmentHint.sn as number;
+    }
+
+    if (
+      fragPrevious &&
+      this.shouldLoadFragmentWithSameSN(fragPrevious, end, levelDetails)
+    ) {
+      const targetSN = fragPrevious.sn as number;
+      if (targetSN >= levelDetails.startSN && targetSN <= levelDetails.endSN) {
+        return fragments[targetSN - levelDetails.startSN];
+      }
     }
 
     let frag;
