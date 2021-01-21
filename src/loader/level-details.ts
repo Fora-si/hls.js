@@ -1,5 +1,6 @@
 import { Part } from './fragment';
 import type { Fragment } from './fragment';
+import LevelKey from './level-key';
 import type { AttrList } from '../utils/attr-list';
 
 const DEFAULT_TARGET_DURATION = 10;
@@ -47,6 +48,7 @@ export class LevelDetails {
   public driftEndTime: number = 0;
   public driftStart: number = 0;
   public driftEnd: number = 0;
+  public drmInfo: Array<LevelKey> = [];
 
   constructor(baseUrl) {
     this.fragments = [];
