@@ -57,6 +57,8 @@ export type EMEControllerConfig = {
   licenseResponseCallback?: (xhr: XMLHttpRequest, url: string) => ArrayBuffer;
   emeEnabled: boolean;
   widevineLicenseUrl?: string;
+  playreadyLicenseUrl?: string;
+  drmSystem: string | undefined;
   drmSystemOptions: DRMSystemOptions;
   requestMediaKeySystemAccessFunc: MediaKeyFunc | null;
 };
@@ -255,6 +257,8 @@ export const hlsDefaultConfig: HlsConfig = {
   minAutoBitrate: 0, // used by hls
   emeEnabled: false, // used by eme-controller
   widevineLicenseUrl: undefined, // used by eme-controller
+  playreadyLicenseUrl: undefined, // used by eme-controller
+  drmSystem: undefined, // used by eme-controller
   drmSystemOptions: {}, // used by eme-controller
   requestMediaKeySystemAccessFunc: requestMediaKeySystemAccess, // used by eme-controller
   testBandwidth: true,
