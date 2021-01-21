@@ -853,7 +853,12 @@ export default class BaseStreamController
       }
       if (!frag) {
         // SN does not need to be accurate between renditions, but depending on the packaging it may be so.
-        const targetSN = (fragPrevious.sn as number) + 1;
+        let targetSN : number;
+        if (fragPrevious.sn === 'initSegment') {
+          targetSN = levelDetails.startSN;
+        } else {
+          targetSN = (fragPrevious.sn as number) + 1;
+        }
         if (
           targetSN >= levelDetails.startSN &&
           targetSN <= levelDetails.endSN
