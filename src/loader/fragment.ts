@@ -139,6 +139,10 @@ export default class Fragment extends BaseSegment {
   public bitrateTest: boolean = false;
   // #EXTINF  segment title
   public title: string | null = null;
+  // Drm Info
+  public drmInfo: Array<LevelKey> = [];
+  // Found keys
+  public foundKeys: boolean = false;
 
   constructor(type: PlaylistLevelType, baseurl: string) {
     super(baseurl);

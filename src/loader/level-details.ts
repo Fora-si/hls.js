@@ -1,4 +1,5 @@
 import Fragment, { Part } from './fragment';
+import LevelKey from './level-key';
 import type AttrList from '../utils/attr-list';
 
 const DEFAULT_TARGET_DURATION = 10;
@@ -42,6 +43,7 @@ export default class LevelDetails {
   public renditionReports?: AttrList[];
   public tuneInGoal: number = 0;
   public deltaUpdateFailed?: boolean;
+  public drmInfo: Array<LevelKey> = [];
 
   constructor(baseUrl) {
     this.fragments = [];
