@@ -205,6 +205,7 @@ export default class M3U8Parser {
     let i: number;
     let levelkey: LevelKey | undefined;
     let firstPdtIndex = -1;
+    let drmInfo: Array<LevelKey> = [];
 
     LEVEL_PLAYLIST_REGEX_FAST.lastIndex = 0;
     level.m3u8 = string;
@@ -229,6 +230,13 @@ export default class M3U8Parser {
           frag.level = id;
           frag.cc = discontinuityCounter;
           frag.urlId = levelUrlId;
+          frag.drmInfo =
+            drmInfo && drmInfo.length > 0
+              ? drmInfo
+              : prevFrag
+              ? prevFrag.drmInfo
+              : [];
+          frag.foundKeys = !!drmInfo.length;
           fragments.push(frag);
           // avoid sliced strings    https://github.com/video-dev/hls.js/issues/939
           frag.relurl = (' ' + result[3]).slice(1);
@@ -239,6 +247,8 @@ export default class M3U8Parser {
           currentPart = 0;
 
           frag = new Fragment(type, baseurl);
+          // once captured, array needs to be reset and rely on previous fragment until new keys are available
+          drmInfo = [];
           // setup the next fragment for part loading
           frag.start = totalduration;
           frag.sn = currentSN;
@@ -350,25 +360,18 @@ export default class M3U8Parser {
             const decryptkeyformat =
               keyAttrs.enumeratedString('KEYFORMAT') ?? 'identity';
 
-            const unsupportedKnownKeyformatsInManifest = [
-              'com.apple.streamingkeydelivery',
+            const supportedKeyformatsInManifest = [
               'com.microsoft.playready',
               'urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed', // widevine (v2)
-              'com.widevine', // earlier widevine (v1)
+              'identity',
             ];
 
             if (
-              unsupportedKnownKeyformatsInManifest.indexOf(decryptkeyformat) >
-              -1
+              supportedKeyformatsInManifest.indexOf(decryptkeyformat) === -1
             ) {
               logger.warn(
                 `Keyformat ${decryptkeyformat} is not supported from the manifest`
               );
-              continue;
-            } else if (decryptkeyformat !== 'identity') {
-              // We are supposed to skip keys we don't understand.
-              // As we currently only officially support identity keys
-              // from the manifest we shouldn't save any other key.
               continue;
             }
 
@@ -380,9 +383,12 @@ export default class M3U8Parser {
               levelkey = LevelKey.fromURL(baseurl, decrypturi);
               if (
                 decrypturi &&
-                ['AES-128', 'SAMPLE-AES', 'SAMPLE-AES-CENC'].indexOf(
-                  decryptmethod
-                ) >= 0
+                [
+                  'AES-128',
+                  'SAMPLE-AES',
+                  'SAMPLE-AES-CENC',
+                  'SAMPLE-AES-CTR',
+                ].indexOf(decryptmethod) >= 0
               ) {
                 levelkey.method = decryptmethod;
                 levelkey.keyFormat = decryptkeyformat;
@@ -398,6 +404,7 @@ export default class M3U8Parser {
                 // Initialization Vector (IV)
                 levelkey.iv = decryptiv;
               }
+              drmInfo.push(levelkey);
             }
             break;
           }
@@ -533,6 +540,7 @@ export default class M3U8Parser {
     }
     level.totalduration = totalduration;
     level.endCC = discontinuityCounter;
+    level.drmInfo = drmInfo;
 
     /**
      * Backfill any missing PDT values
