@@ -2,6 +2,8 @@ import { buildAbsoluteURL } from 'url-toolkit';
 
 export class LevelKey {
   private _uri: string | null = null;
+  public baseuri: string | null = null;
+  public reluri: string | undefined = undefined;
   public method: string | null = null;
   public keyFormat: string | null = null;
   public keyFormatVersions: string | null = null;
@@ -18,6 +20,8 @@ export class LevelKey {
   }
 
   private constructor(absoluteOrBaseURI: string, relativeURL?: string) {
+    this.baseuri = absoluteOrBaseURI;
+    this.reluri = relativeURL;
     if (relativeURL) {
       this._uri = buildAbsoluteURL(absoluteOrBaseURI, relativeURL, {
         alwaysNormalize: true,

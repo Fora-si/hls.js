@@ -141,6 +141,10 @@ export class Fragment extends BaseSegment {
   public title: string | null = null;
   // The Media Initialization Section for this segment
   public initSegment: Fragment | null = null;
+  // Drm Info
+  public drmInfo: Array<LevelKey> = [];
+  // Found keys
+  public foundKeys: boolean = false;
 
   constructor(type: PlaylistLevelType, baseurl: string) {
     super(baseurl);

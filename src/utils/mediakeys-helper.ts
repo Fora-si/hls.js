@@ -6,6 +6,20 @@ export enum KeySystems {
   PLAYREADY = 'com.microsoft.playready',
 }
 
+export enum DRMIdentifiers {
+  WIDEVINE = 'urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed',
+  PLAYREADY = 'com.microsoft.playready',
+}
+
+/**
+ * @see https://www.w3.org/TR/eme-initdata-registry/
+ */
+export enum InitDataTypes {
+  COMMON_ENCRYPTION = 'cenc',
+  KEY_IDS = 'keyids',
+  WEBM = 'webm',
+}
+
 export type MediaKeyFunc = (
   keySystem: KeySystems,
   supportedConfigurations: MediaKeySystemConfiguration[]
