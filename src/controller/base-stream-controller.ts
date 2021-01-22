@@ -783,6 +783,9 @@ export default class BaseStreamController
     const targetDuration = levelDetails.targetduration;
     const bandwidth = this.hls.bandwidthEstimate;
     if (fragPrevious && levels && levelLastLoaded && fragEndTime) {
+      if (fragPrevious.sn === 'initSegment') {
+        return false;
+      }
       const previousLevel = levels[fragPrevious.level];
       const loadLevel = levels[levelLastLoaded];
       if (
