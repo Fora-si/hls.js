@@ -162,10 +162,10 @@ class AudioTrackController extends BasePlaylistController {
   set audioTrack(newId: number) {
     // If audio track is selected from API then don't choose from the manifest default track
     this.selectDefaultTrack = false;
-    this.setAudioTrack(newId);
+    this.setAudioTrack(newId, true);
   }
 
-  private setAudioTrack(newId: number): void {
+  private setAudioTrack(newId: number, manual: boolean): void {
     const tracks = this.tracksInGroup;
     // noop on same audio track id as already set
     if (this.trackId === newId && tracks[newId]?.details) {
@@ -186,7 +186,7 @@ class AudioTrackController extends BasePlaylistController {
     this.log(`Now switching to audio-track index ${newId}`);
     this.trackId = newId;
     const { url, type, id } = track;
-    this.hls.trigger(Events.AUDIO_TRACK_SWITCHING, { id, type, url });
+    this.hls.trigger(Events.AUDIO_TRACK_SWITCHING, { id, type, url, manual });
     const hlsUrlParameters = this.switchParams(track.url, lastTrack?.details);
     this.loadPlaylist(hlsUrlParameters);
   }
@@ -202,7 +202,7 @@ class AudioTrackController extends BasePlaylistController {
       this.findTrackId(currentAudioTrackName) || this.findTrackId();
 
     if (trackId !== -1) {
-      this.setAudioTrack(trackId);
+      this.setAudioTrack(trackId, false);
     } else {
       this.warn(`No track found for running audio group-ID: ${this.groupId}`);
 
