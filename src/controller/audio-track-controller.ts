@@ -193,7 +193,7 @@ class AudioTrackController extends BasePlaylistController {
 
       const selectedTrackId = this.trackId;
       if (trackId !== -1 && selectedTrackId === -1) {
-        this.setAudioTrack(trackId);
+        this.setAudioTrack(trackId, false);
       } else if (audioTracks.length && selectedTrackId === -1) {
         const error = new Error(
           `No audio track selected for current audio group-ID(s): ${this.groupIds?.join(
@@ -241,7 +241,7 @@ class AudioTrackController extends BasePlaylistController {
   set audioTrack(newId: number) {
     // If audio track is selected from API then don't choose from the manifest default track
     this.selectDefaultTrack = false;
-    this.setAudioTrack(newId);
+    this.setAudioTrack(newId, true);
   }
 
   public setAudioOption(
@@ -269,7 +269,7 @@ class AudioTrackController extends BasePlaylistController {
         );
         if (groupIndex > -1) {
           const track = this.tracksInGroup[groupIndex];
-          this.setAudioTrack(groupIndex);
+          this.setAudioTrack(groupIndex, false);
           return track;
         } else if (currentTrack) {
           // Find option in nearest level audio group
@@ -307,7 +307,7 @@ class AudioTrackController extends BasePlaylistController {
     return null;
   }
 
-  private setAudioTrack(newId: number): void {
+  private setAudioTrack(newId: number, manual: boolean): void {
     const tracks = this.tracksInGroup;
 
     // check if level idx is valid
@@ -328,7 +328,10 @@ class AudioTrackController extends BasePlaylistController {
     );
     this.trackId = newId;
     this.currentTrack = track;
-    this.hls.trigger(Events.AUDIO_TRACK_SWITCHING, { ...track });
+    this.hls.trigger(Events.AUDIO_TRACK_SWITCHING, {
+      ...track,
+      manual: manual,
+    });
     // Do not reload track unless live
     if (trackLoaded) {
       return;

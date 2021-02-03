@@ -65,6 +65,7 @@ class AudioStreamController
   private audioOnly: boolean = false;
   private bufferedTrack: MediaPlaylist | null = null;
   private switchingTrack: MediaPlaylist | null = null;
+  private manualAudioSwitch: boolean = false;
   private trackId: number = -1;
   private waitingData: WaitingForPTSData | null = null;
   private mainDetails: LevelDetails | null = null;
@@ -487,6 +488,7 @@ class AudioStreamController
     // should we switch tracks ?
     if (altAudio) {
       this.switchingTrack = data;
+      this.manualAudioSwitch = data.manual;
       // main audio track are handled by stream-controller, just do something if switching to alt audio track
       this.flushAudioIfNeeded(data);
       if (this.state !== State.STOPPED) {
@@ -1023,7 +1025,7 @@ class AudioStreamController
   }
 
   private flushAudioIfNeeded(switchingTrack: MediaPlaylist) {
-    if (this.media && this.bufferedTrack) {
+    if (this.media && this.bufferedTrack && this.manualAudioSwitch) {
       const { name, lang, assocLang, characteristics, audioCodec, channels } =
         this.bufferedTrack;
       if (
@@ -1050,6 +1052,7 @@ class AudioStreamController
     this.flushAudioIfNeeded(switchingTrack);
     this.bufferedTrack = switchingTrack;
     this.switchingTrack = null;
+    this.manualAudioSwitch = false;
     hls.trigger(Events.AUDIO_TRACK_SWITCHED, { ...switchingTrack });
   }
 }
