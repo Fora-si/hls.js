@@ -143,7 +143,7 @@ class AudioTrackController extends BasePlaylistController {
       this.selectInitialTrack();
     } else if (this.shouldReloadPlaylist(this.currentTrack)) {
       // Retry playlist loading if no playlist is or has been loaded yet
-      this.setAudioTrack(this.trackId);
+      this.setAudioTrack(this.trackId, false);
     }
   }
 
@@ -173,10 +173,10 @@ class AudioTrackController extends BasePlaylistController {
   set audioTrack(newId: number) {
     // If audio track is selected from API then don't choose from the manifest default track
     this.selectDefaultTrack = false;
-    this.setAudioTrack(newId);
+    this.setAudioTrack(newId, true);
   }
 
-  private setAudioTrack(newId: number): void {
+  private setAudioTrack(newId: number, manual: boolean): void {
     const tracks = this.tracksInGroup;
 
     // check if level idx is valid
@@ -198,7 +198,7 @@ class AudioTrackController extends BasePlaylistController {
     this.trackId = newId;
     this.currentTrack = track;
     this.selectDefaultTrack = false;
-    this.hls.trigger(Events.AUDIO_TRACK_SWITCHING, { ...track });
+    this.hls.trigger(Events.AUDIO_TRACK_SWITCHING, { ...track, manual: manual });
     // Do not reload track unless live
     if (track.details && !track.details.live) {
       return;
@@ -213,7 +213,7 @@ class AudioTrackController extends BasePlaylistController {
       this.findTrackId(this.currentTrack) | this.findTrackId(null);
 
     if (trackId !== -1) {
-      this.setAudioTrack(trackId);
+      this.setAudioTrack(trackId, false);
     } else {
       const error = new Error(
         `No track found for running audio group-ID: ${this.groupId} track count: ${audioTracks.length}`
