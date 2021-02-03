@@ -87,6 +87,10 @@ function startWorker() {
         }
         break;
       }
+      case 'resetNextTimestamp': {
+        transmuxer.resetNextTimestamp();
+        break;
+      }
       case 'flush': {
         const chunkMeta = data.chunkMeta as ChunkMetadata;
         const transmuxResult = transmuxer.flush(chunkMeta);
