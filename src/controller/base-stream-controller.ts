@@ -994,8 +994,7 @@ export default class BaseStreamController
       const start = levelDetails.fragments[0].start;
       const end = levelDetails.edge;
       if (
-        currentTime <
-        Math.max(start - config.maxFragLookUpTolerance, end - maxLatency)
+        currentTime < end - maxLatency
       ) {
         if (!this.loadedmetadata) {
           this.nextLoadPosition = liveSyncPosition;
