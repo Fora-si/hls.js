@@ -395,6 +395,9 @@ class AudioStreamController
     } else {
       // switching to audio track, start timer if not already started
       this.setInterval(TICK_INTERVAL);
+      if (transmuxer) {
+        transmuxer.resetNextTimestamp();
+      }
     }
 
     // should we switch tracks ?
@@ -682,10 +685,6 @@ class AudioStreamController
         ElementaryStreamTypes.AUDIO,
         BufferHelper.getBuffered(media)
       );
-    }
-    const transmuxer = this.transmuxer;
-    if (transmuxer && type === ElementaryStreamTypes.AUDIO) {
-      transmuxer.resetNextTimestamp();
     }
     // reset reference to frag
     this.fragPrevious = null;
