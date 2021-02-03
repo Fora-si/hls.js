@@ -289,6 +289,14 @@ export default class Transmuxer {
     remuxer.resetTimeStamp(defaultInitPts);
   }
 
+  resetNextTimestamp() {
+    const { remuxer } = this;
+    if (!remuxer) {
+      return;
+    }
+    remuxer.resetNextTimestamp();
+  }
+
   resetContiguity() {
     const { demuxer, remuxer } = this;
     if (!demuxer || !remuxer) {

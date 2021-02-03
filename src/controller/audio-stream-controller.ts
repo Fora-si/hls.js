@@ -681,6 +681,10 @@ class AudioStreamController
         BufferHelper.getBuffered(media)
       );
     }
+    const transmuxer = this.transmuxer;
+    if (transmuxer && type === ElementaryStreamTypes.AUDIO) {
+      transmuxer.resetNextTimestamp();
+    }
     // reset reference to frag
     this.fragPrevious = null;
     // move to IDLE once flush complete. this should trigger new fragment loading
