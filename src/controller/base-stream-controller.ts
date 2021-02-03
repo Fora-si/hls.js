@@ -1073,6 +1073,7 @@ export default class BaseStreamController
       this.log(
         `Fragment ${frag.sn} of level ${frag.level} was aborted, flushing transmuxer`
       );
+      this.fragPrevious = null;
       this.transmuxer.flush(
         new ChunkMetadata(
           frag.level,
