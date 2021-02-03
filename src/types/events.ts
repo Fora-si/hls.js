@@ -159,6 +159,7 @@ export interface AudioTrackSwitchingData {
   groupId: string;
   type: MediaPlaylistType | 'main';
   url: string;
+  manual: boolean;
 }
 
 export interface AudioTrackSwitchedData {

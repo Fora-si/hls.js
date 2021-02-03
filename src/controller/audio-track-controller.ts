@@ -166,10 +166,10 @@ class AudioTrackController extends BasePlaylistController {
   set audioTrack(newId: number) {
     // If audio track is selected from API then don't choose from the manifest default track
     this.selectDefaultTrack = false;
-    this.setAudioTrack(newId);
+    this.setAudioTrack(newId, true);
   }
 
-  private setAudioTrack(newId: number): void {
+  private setAudioTrack(newId: number, manual: boolean): void {
     const tracks = this.tracksInGroup;
 
     // check if level idx is valid
@@ -194,6 +194,7 @@ class AudioTrackController extends BasePlaylistController {
       name,
       type,
       url,
+      manual
     });
     // Do not reload track unless live
     if (track.details && !track.details.live) {
@@ -214,7 +215,7 @@ class AudioTrackController extends BasePlaylistController {
       this.findTrackId(currentAudioTrackName) || this.findTrackId();
 
     if (trackId !== -1) {
-      this.setAudioTrack(trackId);
+      this.setAudioTrack(trackId, false);
     } else {
       this.warn(`No track found for running audio group-ID: ${this.groupId}`);
 
