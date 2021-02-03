@@ -1153,6 +1153,7 @@ export default class BaseStreamController
           frag.level
         } was aborted`
       );
+      this.fragPrevious = null;
       this.resetFragmentLoading(frag);
     }
   }
