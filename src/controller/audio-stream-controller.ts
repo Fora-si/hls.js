@@ -466,6 +466,10 @@ class AudioStreamController
     } else {
       // switching to audio track, start timer if not already started
       this.setInterval(TICK_INTERVAL);
+      let transmuxer = this.transmuxer;
+      if (transmuxer) {
+        transmuxer.resetNextTimestamp();
+      }
     }
 
     // should we switch tracks ?
