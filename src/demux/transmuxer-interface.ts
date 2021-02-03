@@ -323,6 +323,20 @@ export default class TransmuxerInterface {
     }
   }
 
+  resetNextTimestamp() {
+    const { transmuxer } = this;
+    if (this.workerContext) {
+      const { worker } = this.workerContext;
+      if (worker) {
+        worker.postMessage({
+          cmd: 'resetNextTimestamp',
+        });
+      }
+    } else if (transmuxer) {
+      transmuxer.resetNextTimestamp();
+    }
+  }
+
   private transmuxerError(
     error: Error,
     chunkMeta: ChunkMetadata,
