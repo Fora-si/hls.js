@@ -52,6 +52,10 @@ export default function TransmuxerWorker(self) {
         }
         break;
       }
+      case 'resetNextTimestamp': {
+        self.transmuxer.resetNextTimestamp();
+        break;
+      }
       case 'flush': {
         const id = data.chunkMeta;
         const transmuxResult = self.transmuxer.flush(id);

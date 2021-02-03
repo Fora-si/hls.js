@@ -255,6 +255,17 @@ export default class TransmuxerInterface {
     }
   }
 
+  resetNextTimestamp() {
+    const { transmuxer, worker } = this;
+    if (worker) {
+      worker.postMessage({
+        cmd: 'resetNextTimestamp',
+      });
+    } else if (transmuxer) {
+      transmuxer.resetNextTimestamp();
+    }
+  }
+
   private handleFlushResult(
     results: Array<TransmuxerResult>,
     chunkMeta: ChunkMetadata
