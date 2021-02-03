@@ -494,6 +494,10 @@ class AudioStreamController
       if (this.state !== State.STOPPED) {
         // switching to audio track, start timer if not already started
         this.setInterval(TICK_INTERVAL);
+        let transmuxer = this.transmuxer;
+        if (transmuxer) {
+          transmuxer.resetNextTimestamp();
+        }
         this.state = State.IDLE;
         this.tick();
       }
