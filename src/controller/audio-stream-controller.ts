@@ -589,7 +589,9 @@ class AudioStreamController
       );
       return;
     }
-    this.fragPrevious = frag;
+    if (frag.sn !== 'initSegment') {
+      this.fragPrevious = frag;
+    }
     if (this.audioSwitch && frag.sn !== 'initSegment') {
       this.audioSwitch = false;
       this.hls.trigger(Events.AUDIO_TRACK_SWITCHED, { id: this.trackId });

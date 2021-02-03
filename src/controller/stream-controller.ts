@@ -841,7 +841,9 @@ export default class StreamController
     this.fragLastKbps = Math.round(
       (8 * stats.total) / (stats.buffering.end - stats.loading.first)
     );
-    this.fragPrevious = frag;
+    if (frag.sn !== 'initSegment') {
+      this.fragPrevious = frag;
+    }
     this.fragBufferedComplete(frag, part);
   }
 
