@@ -52,6 +52,7 @@ class AudioStreamController
   private videoTrackCC: number = -1;
   private waitingVideoCC: number = -1;
   private audioSwitch: boolean = false;
+  private manualAudioSwitch: boolean = false;
   private trackId: number = -1;
   private waitingData: WaitingForPTSData | null = null;
   private mainDetails: LevelDetails | null = null;
@@ -395,6 +396,7 @@ class AudioStreamController
     // should we switch tracks ?
     if (altAudio) {
       this.audioSwitch = true;
+      this.manualAudioSwitch = data.manual;
       // main audio track are handled by stream-controller, just do something if switching to alt audio track
       this.state = State.IDLE;
     } else {
@@ -824,8 +826,8 @@ class AudioStreamController
   }
 
   private completeAudioSwitch() {
-    const { hls, media, trackId } = this;
-    if (media) {
+    const { hls, media, trackId, manualAudioSwitch } = this;
+    if (media && manualAudioSwitch) {
       this.log('Switching audio track : flushing all audio');
       hls.trigger(Events.BUFFER_FLUSHING, {
         startOffset: 0,
@@ -834,6 +836,7 @@ class AudioStreamController
       });
     }
     this.audioSwitch = false;
+    this.manualAudioSwitch = false;
     hls.trigger(Events.AUDIO_TRACK_SWITCHED, { id: trackId });
   }
 }
