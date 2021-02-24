@@ -1,6 +1,6 @@
 import { Part } from './fragment';
 import type { Fragment } from './fragment';
-import LevelKey from './level-key';
+import type { LevelKey } from './level-key';
 import type { AttrList } from '../utils/attr-list';
 
 const DEFAULT_TARGET_DURATION = 10;
