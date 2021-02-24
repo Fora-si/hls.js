@@ -295,6 +295,7 @@ export default class StreamController
       targetBufferTime = bufferInfo.end;
       frag = this.getNextFragment(targetBufferTime, levelDetails);
       // Avoid loop loading by using nextLoadPosition set for backtracking
+      // TODO: this could be improved to simply pick next sn fragment
       if (
         frag &&
         this.fragmentTracker.getState(frag) === FragmentState.OK &&
