@@ -1,5 +1,6 @@
 import { Part } from './fragment';
 import type { Fragment } from './fragment';
+import type { LevelKey } from './level-key';
 import type { AttrList } from '../utils/attr-list';
 import type { DateRange } from './date-range';
 import type { VariableMap } from '../types/level';
