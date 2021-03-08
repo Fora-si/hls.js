@@ -235,7 +235,7 @@ export default class M3U8Parser {
               : prevFrag
               ? prevFrag.drmInfo
               : [];
-          frag.foundKeys = !!drmInfo.length;
+          frag.foundKeys = !!frag.drmInfo.length;
           fragments.push(frag);
           // avoid sliced strings    https://github.com/video-dev/hls.js/issues/939
           frag.relurl = (' ' + result[3]).slice(1);
