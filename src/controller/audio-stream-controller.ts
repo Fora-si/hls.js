@@ -199,9 +199,10 @@ class AudioStreamController
             this.clearWaitingFragment();
           } else {
             // Drop waiting fragment if an earlier fragment is needed
+            let currentTime = this.lastCurrentTime > 0 ? this.lastCurrentTime : this.media.currentTime;
             const bufferInfo = BufferHelper.bufferInfo(
               this.mediaBuffer,
-              this.media.currentTime,
+              currentTime,
               this.config.maxBufferHole
             );
             const waitingFragmentAtPosition = fragmentWithinToleranceTest(
