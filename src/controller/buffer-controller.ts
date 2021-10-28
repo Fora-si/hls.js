@@ -743,7 +743,7 @@ export default class BufferController implements ComponentAPI {
     targetDuration: number,
     targetBackBufferPosition: number,
   ) {
-    const { details, sourceBuffer } = this;
+    const { details, sourceBuffer, media } = this;
     const sourceBufferTypes = this.getSourceBufferTypes();
 
     sourceBufferTypes.forEach((type: SourceBufferName) => {
@@ -753,7 +753,10 @@ export default class BufferController implements ComponentAPI {
         // when target buffer start exceeds actual buffer start
         if (
           buffered.length > 0 &&
-          targetBackBufferPosition > buffered.start(0)
+          targetBackBufferPosition > buffered.start(0) &&
+          media != null &&
+          media.buffered.length > 0 &&
+          targetBackBufferPosition > media.buffered.start(0)
         ) {
           this.hls.trigger(Events.BACK_BUFFER_REACHED, {
             bufferEnd: targetBackBufferPosition,
