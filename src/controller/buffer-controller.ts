@@ -1228,7 +1228,10 @@ transfer tracks: ${stringify(transferredTracks, (key, value) => (key === 'initSe
         // when target buffer start exceeds actual buffer start
         if (
           buffered.length > 0 &&
-          targetBackBufferPosition > buffered.start(0)
+          targetBackBufferPosition > buffered.start(0) &&
+          this.media != null &&
+          this.media.buffered.length > 0 &&
+          targetBackBufferPosition > this.media.buffered.start(0)
         ) {
           this.hls.trigger(Events.BACK_BUFFER_REACHED, {
             bufferEnd: targetBackBufferPosition,
