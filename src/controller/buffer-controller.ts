@@ -622,7 +622,9 @@ export default class BufferController implements ComponentAPI {
         // when target buffer start exceeds actual buffer start
         if (
           buffered.length > 0 &&
-          targetBackBufferPosition > buffered.start(0)
+          targetBackBufferPosition > buffered.start(0) &&
+          media.buffered.length > 0 &&
+          targetBackBufferPosition > media.buffered.start(0)
         ) {
           hls.trigger(Events.BACK_BUFFER_REACHED, {
             bufferEnd: targetBackBufferPosition,
