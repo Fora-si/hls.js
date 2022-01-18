@@ -1884,7 +1884,9 @@ export default class BaseStreamController
     const { media } = this;
     // if we have not yet loaded any fragment, start loading from start position
     let pos = 0;
-    if (this.hls?.hasEnoughToStart && media) {
+    if (this.state == State.WAITING_INIT_PTS && this.lastCurrentTime > 0) {
+      pos = this.lastCurrentTime;
+    } else if (this.hls?.hasEnoughToStart && media) {
       pos = media.currentTime;
     } else if (this.nextLoadPosition >= 0) {
       pos = this.nextLoadPosition;
