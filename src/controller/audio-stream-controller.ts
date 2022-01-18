@@ -55,6 +55,7 @@ class AudioStreamController
   private trackId: number = -1;
   private waitingData: WaitingForPTSData | null = null;
   private mainDetails: LevelDetails | null = null;
+  private waitingTrackLoadedData: TrackLoadedData | null = null;
   private bufferFlushed: boolean = false;
 
   constructor(hls: Hls, fragmentTracker: FragmentTracker) {
@@ -65,6 +66,7 @@ class AudioStreamController
   protected onHandlerDestroying() {
     this._unregisterListeners();
     this.mainDetails = null;
+    this.waitingTrackLoadedData = null;
   }
 
   private _registerListeners() {
@@ -412,6 +414,7 @@ class AudioStreamController
 
   onManifestLoading() {
     this.mainDetails = null;
+    this.waitingTrackLoadedData = null;
     this.fragmentTracker.removeAllFragments();
     this.startPosition = this.lastCurrentTime = 0;
     this.bufferFlushed = false;
@@ -419,6 +422,11 @@ class AudioStreamController
 
   onLevelLoaded(event: Events.LEVEL_LOADED, data: LevelLoadedData) {
     this.mainDetails = data.details;
+    const trackData = this.waitingTrackLoadedData;
+    if (trackData) {
+      this.waitingTrackLoadedData = null;
+      this.onAudioTrackLoaded(Events.AUDIO_TRACK_LOADED, trackData);
+    }
   }
 
   onAudioTrackLoaded(event: Events.AUDIO_TRACK_LOADED, data: TrackLoadedData) {
@@ -439,7 +447,11 @@ class AudioStreamController
       if (!newDetails.fragments[0]) {
         newDetails.deltaUpdateFailed = true;
       }
-      if (newDetails.deltaUpdateFailed || !mainDetails) {
+      if (!mainDetails) {
+        this.waitingTrackLoadedData = data;
+        return;
+      }
+      if (newDetails.deltaUpdateFailed) {
         return;
       }
       if (
