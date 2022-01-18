@@ -1227,7 +1227,7 @@ export default class BaseStreamController
       }
       if (!frag) {
         // SN does not need to be accurate between renditions, but depending on the packaging it may be so.
-        let targetSN : number;
+        let targetSN: number;
         if (fragPrevious.sn === 'initSegment') {
           targetSN = levelDetails.startSN;
         } else {
@@ -1495,7 +1495,9 @@ export default class BaseStreamController
     const { media } = this;
     // if we have not yet loaded any fragment, start loading from start position
     let pos = 0;
-    if (this.loadedmetadata && media) {
+    if (this.state == State.WAITING_INIT_PTS && this.lastCurrentTime > 0) {
+      pos = this.lastCurrentTime;
+    } else if (this.loadedmetadata && media) {
       pos = media.currentTime;
     } else if (this.nextLoadPosition) {
       pos = this.nextLoadPosition;
