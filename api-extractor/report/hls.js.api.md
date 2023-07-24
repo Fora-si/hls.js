@@ -272,6 +272,8 @@ export interface AudioTrackSwitchedData extends MediaPlaylist {
 //
 // @public (undocumented)
 export interface AudioTrackSwitchingData extends MediaPlaylist {
+    // (undocumented)
+    manual: boolean;
 }
 
 // Warning: (ae-missing-release-tag) "AudioTrackUpdatedData" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -539,6 +541,8 @@ export class BaseStreamController extends TaskLoop implements NetworkComponentAP
     protected retryDate: number;
     // (undocumented)
     protected setStartPosition(details: LevelDetails, sliding: number): void;
+    // (undocumented)
+    protected shouldLoadFragmentWithSameSN(fragPrevious: Fragment, bufferEnd: number, levelDetails: LevelDetails): boolean;
     // (undocumented)
     protected startFragRequested: boolean;
     // (undocumented)
