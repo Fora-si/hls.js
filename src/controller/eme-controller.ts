@@ -976,6 +976,59 @@ class EMEController implements ComponentAPI {
     );
   }
 
+  /**
+   * @private
+   * @param {XMLHttpRequest} xhr
+   * @param {Uint8Array} licenseChallenge
+   * @returns {Uint8Array} Challenge data posted to license server
+   * @throws if PlayReady XML is malformed
+   */
+  private _unpackPlayReadyLicenseRequest(
+    xhr: XMLHttpRequest,
+    licenseChallenge: Uint8Array
+  ): Uint8Array {
+    // On Edge, the raw license message is UTF-16-encoded XML.  We need
+    // to unpack the Challenge element (base64-encoded string containing the
+    // actual license request) and any HttpHeader elements (sent as request
+    // headers).
+    // For PlayReady CDMs, we need to dig the Challenge out of the XML.
+    const xmlString = String.fromCharCode.apply(
+      null,
+      new Uint16Array(licenseChallenge.buffer)
+    );
+    if (!xmlString.includes('PlayReadyKeyMessage')) {
+      // This does not appear to be a wrapped message as on Edge.  Some
+      // clients do not need this unwrapping, so we will assume this is one of
+      // them.  Note that "xml" at this point probably looks like random
+      // garbage, since we interpreted UTF-8 as UTF-16.
+      xhr.setRequestHeader('Content-Type', 'text/xml; charset=utf-8');
+      return licenseChallenge;
+    }
+    const keyMessageXml = new DOMParser().parseFromString(
+      xmlString,
+      'application/xml'
+    );
+    // Set request headers.
+    const headers = keyMessageXml.querySelectorAll('HttpHeader');
+    if (headers.length > 0) {
+      let header: Element;
+      for (let i = 0, len = headers.length; i < len; i++) {
+        header = headers[i];
+        const name = header.querySelector('name')?.textContent;
+        const value = header.querySelector('value')?.textContent;
+        if (name && value) {
+          xhr.setRequestHeader(name, value);
+        }
+      }
+    }
+    const challengeElement = keyMessageXml.querySelector('Challenge');
+    if (challengeElement?.textContent) {
+      return strToUtf8array(atob(challengeElement.textContent));
+    } else {
+      throw new Error(`Cannot find <Challenge> in key message`);
+    }
+  }
+
   private setupLicenseXHR(
     xhr: XMLHttpRequest,
     url: string,
@@ -1117,6 +1170,12 @@ class EMEController implements ComponentAPI {
 
       this.setupLicenseXHR(xhr, url, keySessionContext, licenseChallenge).then(
         ({ xhr, licenseChallenge }) => {
+          if (keySessionContext.keySystem == KeySystems.PLAYREADY) {
+            licenseChallenge = this._unpackPlayReadyLicenseRequest(
+              xhr,
+              licenseChallenge
+            );
+          }
           xhr.send(licenseChallenge);
         }
       );
