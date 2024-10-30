@@ -241,6 +241,7 @@ class TSDemuxer implements Demuxer {
     let unknownPID: number | null = null;
     let pmtParsed = this.pmtParsed;
     let pmtId = this._pmtId;
+    let pmtData = new Uint8Array(0);
 
     let len = data.length;
     if (this.remainderData) {
@@ -358,9 +359,20 @@ class TSDemuxer implements Demuxer {
               offset += data[offset] + 1;
             }
 
+            pmtData = appendUint8Array(
+              pmtData,
+              data.subarray(offset, start + PACKET_LENGTH),
+            );
+
+            const pmtSectionLength = ((pmtData[1] & 0x0f) << 8) | pmtData[2];
+            if (pmtSectionLength > pmtData.length) {
+              // multi packet PMT
+              break;
+            }
+
             const parsedPIDs = parsePMT(
-              data,
-              offset,
+              pmtData,
+              0,
               this.typeSupported,
               isSampleAes,
               this.observer,
@@ -397,6 +409,9 @@ class TSDemuxer implements Demuxer {
               start = syncOffset - 188;
             }
             pmtParsed = this.pmtParsed = true;
+
+            // reset PMT data
+            pmtData = new Uint8Array(0);
             break;
           }
           case 0x11:
